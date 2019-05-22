@@ -1,5 +1,5 @@
 
-source("utils.R")
+source("gan.R")
 
 train<-read.csv("data/trojki_6185.csv")
 x<-train[,2:785]
@@ -39,16 +39,9 @@ lapply(1:6,
        )
 )
 
+save(gan_model, file="model_3.RData")
 
-# 
-# par(mfrow=c(1,1))
-# image(
-#   # rotate(matrix(unlist(generation[q,]),nrow = 32, byrow = TRUE)),
-#   rotate(matrix(unlist(generation[3,]),nrow = 28, byrow = TRUE)),
-#   # matrix(train[2,2:6401],nrow = 80, byrow = TRUE),
-#   col=grey.colors(255)
-# )
-
+# load("model_3.RData")
 
 
 

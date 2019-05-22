@@ -358,3 +358,5 @@ sigm<-function (x)
   1/(1 + exp(-x))
 }
 
+rotate <- function(x) t(apply(x, 2, rev))
+
