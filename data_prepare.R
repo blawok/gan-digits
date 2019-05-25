@@ -1,33 +1,46 @@
 library(imager)
 
-im <- load.image("3/number-0000004.png")
-im2 <- resize(im, size_x=, size_y=1000)
-vector <- as.vector(t(matrix(im2)))
-plot(im2)
-image((as.matrix(im2)))
+data_prepare <- function(folder_path="3/", destination_file = "threes_full.csv", image_quantity = 10, resizing_to = 28) {
+  
+  # loading all file names into one list
+  files <- list.files(path=folder_path, pattern="*.PNG", full.names=TRUE, recursive=FALSE)
+  
+  df <- data.frame()
+  image_number = 0
+  
+  # resizing images and transforming them into 1-dim vectors and appending them to one dataframe
+  for (file in files) {
+    if (image_number <= image_quantity) {
+      dfTemp <-  file %>%
+        load.image() %>%
+        resize(., size_x=resizing_to, size_y=resizing_to) %>%
+        as.matrix(.) %>%
+        as.vector(.) %>%
+        matrix(., nrow = 1) %>%
+        data.frame(.)
 
-save.image(im2, "trzy.png")
-file <- readPNG("trzy.png")
-
-
-files <- list.files(path="3/", pattern="*.PNG", full.names=TRUE, recursive=FALSE)
-df <- data.frame()
-
-for (file in files) {
-  im <- load.image(file)
-  im2 <- resize(im, size_x=28, size_y=28)
-  vector <- as.vector(as.matrix(im2))
-  print(file)
-  dfTemp <- data.frame(matrix(vector,nrow = 1))
-  df <- rbind(df, dfTemp)
+      df <- rbind(df, dfTemp)
+    }
+    image_number = image_number + 1
+  }
+  
+  # encoding values to either 0 or 255 for better distinction
+  color_update <- function(x){
+    if (x == 1) {
+      x <- 0
+    } else if (x == 0) {
+      x <- 255
+    }
+  }
+  
+  df <- data.frame(apply(df, c(1,2), color_update))
+  
+  # saving file
+  write.csv(df, file = destination_file)
 }
 
-write.csv(df, file = "trojki_6185.csv")
-
-
-image(
-  # rotate(matrix(unlist(generation[q,]),nrow = 32, byrow = TRUE)),
-  # matrix(unlist(df[2,])),
-  matrix(unlist(df[2,]),nrow = 80, ncol=80),
-  col=grey.colors(255)
-)
+# example of usage
+data_prepare(folder_path="3/",
+             destination_file = "threes_full.csv",
+             image_quantity = 10,
+             resizing_to = 28)
