@@ -1,48 +1,65 @@
 
-source("gan.R")
+main_network <- function(file_path = "neural_network/data/trojki.csv", hidden_layers = 10, learning_rate = 0.1, batchsize = 300, num_of_epochs = 20, image_resolution = 28, matrix_columns_from = 2, matrix_columns_until = 785) {
+  
+  source("neural_network/gan.R")
+  
+  train<-read.csv(file_path)
+  x<-train[,matrix_columns_from:matrix_columns_until]
+  x<-x/255
+  x<-as.matrix(x)
+  
+  ### initialize model
+  g_nn<<-nn_model(input_dim=image_resolution*image_resolution,
+                  hidden=hidden_layers,
+                  output_dim=image_resolution*image_resolution,
+                  learningrate=learning_rate,
+                  activationfun="relu",
+                  output="sigm" )
+  d_nn<<-nn_model(input_dim=image_resolution*image_resolution,
+                  hidden=hidden_layers,
+                  output_dim=1,
+                  learningrate=learning_rate,
+                  activationfun="relu",
+                  output="sigm" )
+  
+  numdata<-dim(train)[1]
+  num_f<-numdata* g_nn$input_dim
+  num_d<-numdata* d_nn$input_dim
+  
+  ### traning GANs
+  ganmodel<-gan(x,g_nn,d_nn,
+                batchsize = batchsize,
+                epoch = num_of_epochs,
+                disc_step=1,
+                display_generation_distribution = F,
+                display_generation_image = F)
+  ### If you stop training, stopped model will be saved "gan_model".
+  gan_model$loss
+  
+  generation<-generator(gan_model,6)
+  
+  hist(generation)
+  
+  rotate <- function(x) t(apply(x, 2, rev))
+  
+  par(mfrow=c(3,3))
+  lapply(1:6,
+         function(q) image(
+           rotate(matrix(unlist(generation[q,]),nrow = image_resolution, byrow = TRUE)),
+           col=grey.colors(255)
+         )
+  )
+  
+  save(gan_model, file="neural_network/test_model.RData")
+  
+}
 
-# train<-read.csv("data/trojki_6185.csv")
-train<-read.csv("trojki_full_255.csv")
-x<-train[,2:785]
-x<-x/255
-x<-as.matrix(x)
-
-### initialize model
-g_nn<-nn_model(input_dim=784,hidden=10,output_dim=784,learningrate=0.1,
-               activationfun="relu",output="sigm" )
-d_nn<-nn_model(input_dim=784,hidden=10,output_dim=1,learningrate=0.1,
-               activationfun="relu",output="sigm" )
-
-numdata<-dim(train)[1]
-num_f<-numdata* g_nn$input_dim
-num_d<-numdata* d_nn$input_dim
-
-### traning GANs
-ganmodel<-gan(x,g_nn,d_nn,batchsize = 300,epoch = 1, disc_step=1,display_generation_distribution = F,display_generation_image = F)
-### If you stop training, stopped model will be saved "gan_model".
-gan_model$loss
-
-
-generation<-generator(ganmodel,100)
-## or if you stop traning
-generation<-generator(gan_model,6)
-
-hist(generation)
-
-rotate <- function(x) t(apply(x, 2, rev))
-
-par(mfrow=c(3,3))
-lapply(1:6,
-       function(q) image(
-         rotate(matrix(unlist(generation[q,]),nrow = 28, byrow = TRUE)),
-         col=grey.colors(255)
-       )
-)
-
-save(gan_model, file="model_3.RData")
-
-# load("model_3.RData")
-
-
-
+# example of usage
+main_network(file_path = "neural_network/data/trojki.csv",
+             hidden_layers = 10,
+             learning_rate = 0.1,
+             batchsize = 300,
+             num_of_epochs = 20,
+             image_resolution = 28)
+  
 
