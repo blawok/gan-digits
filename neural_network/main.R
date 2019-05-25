@@ -3,6 +3,7 @@ setwd("C:/Users/Asus/GIT/gan_digits/neural_network")
 
 main_network <- function(dataset_file_path = "data/trojki_full.csv",
                          prepare_data = FALSE,
+                         data_folder_path = "3/",
                          image_quantity = 1000,
                          hidden_layers = 10,
                          learning_rate = 0.1,
@@ -10,14 +11,15 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
                          num_of_epochs = 20,
                          image_resolution = 28,
                          matrix_columns_from = 2,
-                         matrix_columns_until = 785) {
+                         matrix_columns_until = 785,
+                         model_file_name = "test_model.RData") {
   
   source("gan.R")
   source("data_prepare.R")
   
   if (isTRUE(prepare_data)){
     cat("Preparing data this may take aprox:", round(image_quantity*0.03), "sec")
-    data_prepare(folder_path="3/",
+    data_prepare(folder_path = data_folder_path,
                  destination_file = dataset_file_path,
                  image_quantity = image_quantity,
                  resizing_to = image_resolution)
@@ -68,7 +70,7 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
          )
   )
   
-  save(gan_model, file="test_model.RData")
+  save(gan_model, file=model_file_name)
   
 }
 
@@ -80,6 +82,6 @@ main_network(dataset_file_path = "data/trojki_test_test_test.csv",
              batchsize = 300,
              num_of_epochs = 20,
              image_resolution = 28,
-             prepare_data = TRUE)
-  
+             prepare_data = TRUE,
+             model_file_name = "test_model.RData")
 

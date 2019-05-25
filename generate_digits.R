@@ -1,5 +1,5 @@
 
-generate_digits <- function(digit_to_generate = NULL, show_data = FALSE, save_data = FALSE){
+generate_digits <- function(digit_to_generate = NULL, plot_data = FALSE, save_data = FALSE){
   
   if (is.numeric(digit_to_generate)) {
     # load utility functions
@@ -24,12 +24,12 @@ generate_digits <- function(digit_to_generate = NULL, show_data = FALSE, save_da
     }
   
   
-  if (!is.logical(show_data) | !is.logical(save_data)) {
+  if (!is.logical(plot_data) | !is.logical(save_data)) {
     print("'show_data' and 'save_data' have to be logical") 
   }
   
   
-  if (isTRUE(show_data) & is.numeric(digit_to_generate)) {
+  if (isTRUE(plot_data) & is.numeric(digit_to_generate)) {
     # draw new data (remember to enlarge plot window!)
     par(mfrow=c(3,3))
     lapply(1:6,
@@ -45,7 +45,6 @@ generate_digits <- function(digit_to_generate = NULL, show_data = FALSE, save_da
     # save data to a file
     write.csv(generation, "generation_test.csv")
   }
-  
   
 }
 
