@@ -1,9 +1,29 @@
 
-main_network <- function(file_path = "neural_network/data/trojki.csv", hidden_layers = 10, learning_rate = 0.1, batchsize = 300, num_of_epochs = 20, image_resolution = 28, matrix_columns_from = 2, matrix_columns_until = 785) {
+setwd("C:/Users/Asus/GIT/gan_digits/neural_network")
+
+main_network <- function(dataset_file_path = "data/trojki_full.csv",
+                         prepare_data = FALSE,
+                         image_quantity = 1000,
+                         hidden_layers = 10,
+                         learning_rate = 0.1,
+                         batchsize = 300,
+                         num_of_epochs = 20,
+                         image_resolution = 28,
+                         matrix_columns_from = 2,
+                         matrix_columns_until = 785) {
   
-  source("neural_network/gan.R")
+  source("gan.R")
+  source("data_prepare.R")
   
-  train<-read.csv(file_path)
+  if (isTRUE(prepare_data)){
+    cat("Preparing data this may take aprox:", round(image_quantity*0.03), "sec")
+    data_prepare(folder_path="3/",
+                 destination_file = dataset_file_path,
+                 image_quantity = image_quantity,
+                 resizing_to = image_resolution)
+  }
+  
+  train<-read.csv(dataset_file_path)
   x<-train[,matrix_columns_from:matrix_columns_until]
   x<-x/255
   x<-as.matrix(x)
@@ -36,9 +56,7 @@ main_network <- function(file_path = "neural_network/data/trojki.csv", hidden_la
   ### If you stop training, stopped model will be saved "gan_model".
   gan_model$loss
   
-  generation<-generator(gan_model,6)
-  
-  hist(generation)
+  generation<-generator(gan_model,9)
   
   rotate <- function(x) t(apply(x, 2, rev))
   
@@ -50,16 +68,18 @@ main_network <- function(file_path = "neural_network/data/trojki.csv", hidden_la
          )
   )
   
-  save(gan_model, file="neural_network/test_model.RData")
+  save(gan_model, file="test_model.RData")
   
 }
 
 # example of usage
-main_network(file_path = "neural_network/data/trojki.csv",
+main_network(dataset_file_path = "data/trojki_test_test_test.csv",
+             image_quantity = 1000,
              hidden_layers = 10,
              learning_rate = 0.1,
              batchsize = 300,
              num_of_epochs = 20,
-             image_resolution = 28)
+             image_resolution = 28,
+             prepare_data = TRUE)
   
 
