@@ -1,6 +1,17 @@
-library(imager)
+# library(imager)
 
-data_prepare <- function(folder_path="3/", destination_file = "threes_test.csv", image_quantity = 10, resizing_to = 28) {
+if(!require(imager)){
+  install.packages('imager')
+  library(imager)
+} else {
+  library(imager)
+}
+
+
+data_prepare <- function(folder_path="3/",
+                         destination_file = "threes_test.csv",
+                         image_quantity = 10,
+                         resizing_to = 28) {
   
   # loading all file names into one list
   files <- list.files(path=folder_path, pattern="*.PNG", full.names=TRUE, recursive=FALSE)

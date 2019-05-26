@@ -10,6 +10,7 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
                          image_resolution = 28,
                          matrix_columns_from = 2,
                          matrix_columns_until = 785,
+                         plot_digits = FALSE,
                          save_model = FALSE,
                          model_file_name = "models/test_model.RData") {
   
@@ -27,9 +28,6 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
   }
   
   train<-read.csv(dataset_file_path)
-  # x<-train[,matrix_columns_from:matrix_columns_until]
-  # x<-x/255
-  # x<-as.matrix(x)
   
   x <- read.csv(dataset_file_path) %>% 
     .[,matrix_columns_from:matrix_columns_until] %>%
@@ -67,6 +65,8 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
   
   generation<-generator(gan_model,9)
   
+  if (isTRUE(plot_digits)) {
+  
   rotate <- function(x) t(apply(x, 2, rev))
   
   par(mfrow=c(3,3))
@@ -76,11 +76,13 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
            col=grey.colors(255)
          )
   )
+  }
   
   if (isTRUE(save_model)) {
-    save(gan_model, file=model_file_name)
+    save(gan_model, g_nn, d_nn, file=model_file_name)
   }
-
+  
+  
 }
 
 
@@ -88,14 +90,15 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
 # main_network(dataset_file_path = "data/trojki_full.csv",
 #              prepare_data = TRUE,
 #              data_folder_path = "3/",
-#              image_quantity = 1000,
-#              hidden_layers = 10,
+#              image_quantity = 2000,
+#              hidden_layers = 30,
 #              learning_rate = 0.1,
 #              batchsize = 300,
-#              num_of_epochs = 20,
+#              num_of_epochs = 30,
 #              image_resolution = 28,
 #              matrix_columns_from = 2,
 #              matrix_columns_until = 785,
+#              plot_digits = TRUE,
 #              save_model = TRUE,
 #              model_file_name = "models/test_model.RData")
 

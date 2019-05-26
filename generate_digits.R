@@ -1,8 +1,16 @@
 
+if(!require(imager)){
+  install.packages('imager')
+  library(imager)
+} else {
+  library(imager)
+}
+
 generate_digits <- function(# simple generating digits with already computed model
                             digit_to_generate = NULL,
                             plot_data = FALSE,
                             save_data = FALSE,
+                            save_data_as_png = FALSE,
                             num_of_digits_to_generate = 9,
                             
                             # route with network on demand
@@ -41,6 +49,7 @@ generate_digits <- function(# simple generating digits with already computed mod
                  image_resolution = image_resolution,
                  matrix_columns_from = 2,
                  matrix_columns_until = 785,
+                 plot_digits = FALSE,
                  save_model = save_model,
                  model_file_name = model_save_path)
     
@@ -75,13 +84,13 @@ generate_digits <- function(# simple generating digits with already computed mod
       # load desired model data
       load(model_file_name)
       
-      if (isFALSE(network_on_demand)) {
-        # declare model hyperparameters that were used in training this network
-        g_nn<<-nn_model(input_dim=784,hidden=10,output_dim=784,learningrate=0.1,
-                        activationfun="relu",output="sigm" )
-        d_nn<<-nn_model(input_dim=784,hidden=10,output_dim=1,learningrate=0.1,
-                        activationfun="relu",output="sigm" )
-      }
+      # if (isFALSE(network_on_demand)) {
+      #   # declare model hyperparameters that were used in training this network
+      #   g_nn<<-nn_model(input_dim=784,hidden=10,output_dim=784,learningrate=0.1,
+      #                   activationfun="relu",output="sigm" )
+      #   d_nn<<-nn_model(input_dim=784,hidden=10,output_dim=1,learningrate=0.1,
+      #                   activationfun="relu",output="sigm" )
+      # }
 
       # generate new data - specify model and number of new data elements
       generation<-generator(gan_model,num_of_digits_to_generate)
@@ -111,6 +120,10 @@ generate_digits <- function(# simple generating digits with already computed mod
     write.csv(generation, "generation_test.csv")
   }
   
+  if (isTRUE(save_data_as_png) & is.numeric(digit_to_generate) & digit_to_generate == 3){
+    
+  }
+  
 }
 
 # example of usage
@@ -121,15 +134,15 @@ generate_digits(digit_to_generate = 3,
                 
                 # route with network on demand
                 network_on_demand = TRUE,
-                dataset_file_path = "data/test_from_generate.csv",
-                data_folder_path = "3/",
-                image_quantity = 1000,
-                hidden_layers = 10,
+                dataset_file_path = "data/trojki_6185.csv",
+                # data_folder_path = "3/",
+                # image_quantity = 1000,
+                hidden_layers = 30,
                 learning_rate = 0.1,
                 batchsize = 300,
                 num_of_epochs = 20,
                 image_resolution = 28,
-                prepare_data = TRUE,
+                # prepare_data = FALSE,
                 save_model = TRUE,
                 model_save_path = "models/test_from_generate.RData",
                 
