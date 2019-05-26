@@ -1,6 +1,6 @@
 library(imager)
 
-data_prepare <- function(folder_path="3/", destination_file = "threes_full.csv", image_quantity = 10, resizing_to = 28) {
+data_prepare <- function(folder_path="3/", destination_file = "threes_test.csv", image_quantity = 10, resizing_to = 28) {
   
   # loading all file names into one list
   files <- list.files(path=folder_path, pattern="*.PNG", full.names=TRUE, recursive=FALSE)
@@ -38,6 +38,7 @@ data_prepare <- function(folder_path="3/", destination_file = "threes_full.csv",
   # saving file
   write.csv(df, file = destination_file)
 }
+
 
 # # example of usage
 # data_prepare(folder_path="3/",

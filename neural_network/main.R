@@ -1,10 +1,8 @@
 
-setwd("C:/Users/Asus/GIT/gan_digits/neural_network")
-
 main_network <- function(dataset_file_path = "data/trojki_full.csv",
                          prepare_data = FALSE,
                          data_folder_path = "3/",
-                         image_quantity = 1000,
+                         image_quantity = 100,
                          hidden_layers = 10,
                          learning_rate = 0.1,
                          batchsize = 300,
@@ -12,7 +10,10 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
                          image_resolution = 28,
                          matrix_columns_from = 2,
                          matrix_columns_until = 785,
-                         model_file_name = "test_model.RData") {
+                         save_model = FALSE,
+                         model_file_name = "models/test_model.RData") {
+  
+  setwd("C:/Users/Asus/GIT/gan_digits/neural_network")
   
   source("gan.R")
   source("data_prepare.R")
@@ -26,9 +27,14 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
   }
   
   train<-read.csv(dataset_file_path)
-  x<-train[,matrix_columns_from:matrix_columns_until]
-  x<-x/255
-  x<-as.matrix(x)
+  # x<-train[,matrix_columns_from:matrix_columns_until]
+  # x<-x/255
+  # x<-as.matrix(x)
+  
+  x <- read.csv(dataset_file_path) %>% 
+    .[,matrix_columns_from:matrix_columns_until] %>%
+    '/'(255) %>% 
+    as.matrix(.)
   
   ### initialize model
   g_nn<<-nn_model(input_dim=image_resolution*image_resolution,
@@ -55,6 +61,7 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
                 disc_step=1,
                 display_generation_distribution = F,
                 display_generation_image = F)
+  
   ### If you stop training, stopped model will be saved "gan_model".
   gan_model$loss
   
@@ -63,25 +70,32 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
   rotate <- function(x) t(apply(x, 2, rev))
   
   par(mfrow=c(3,3))
-  lapply(1:6,
+  lapply(1:9,
          function(q) image(
            rotate(matrix(unlist(generation[q,]),nrow = image_resolution, byrow = TRUE)),
            col=grey.colors(255)
          )
   )
   
-  save(gan_model, file=model_file_name)
-  
+  if (isTRUE(save_model)) {
+    save(gan_model, file=model_file_name)
+  }
+
 }
 
-# example of usage
-main_network(dataset_file_path = "data/trojki_test_test_test.csv",
-             image_quantity = 1000,
-             hidden_layers = 10,
-             learning_rate = 0.1,
-             batchsize = 300,
-             num_of_epochs = 20,
-             image_resolution = 28,
-             prepare_data = TRUE,
-             model_file_name = "test_model.RData")
+
+# # example of usage
+# main_network(dataset_file_path = "data/trojki_full.csv",
+#              prepare_data = TRUE,
+#              data_folder_path = "3/",
+#              image_quantity = 1000,
+#              hidden_layers = 10,
+#              learning_rate = 0.1,
+#              batchsize = 300,
+#              num_of_epochs = 20,
+#              image_resolution = 28,
+#              matrix_columns_from = 2,
+#              matrix_columns_until = 785,
+#              save_model = TRUE,
+#              model_file_name = "models/test_model.RData")
 
