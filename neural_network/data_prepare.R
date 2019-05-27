@@ -37,7 +37,7 @@ data_prepare <- function(folder_path="3/",
   
   # encoding values to either 0 or 255 for better distinction
   color_update <- function(x){
-    if (x == 1) {
+    if (x > 0) {
       x <- 0
     } else if (x == 0) {
       x <- 255

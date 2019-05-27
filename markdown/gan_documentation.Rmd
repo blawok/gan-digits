@@ -8,7 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 __Following markdown is just a documentation__ - code is splitted into chunks to enhance its clarity.  
-Code that can be runned is placed in another files.
+Codes that can be runned are placed in different files.
 
 ![](C:\Users\Asus\GIT\gan_digits\gan_graph.jpeg)
 
@@ -23,13 +23,20 @@ Load required packages:
 } else {
   library(imager)
 }
+
+if(!require(testit)){
+  install.packages('testit')
+  library(testit)
+} else {
+  library(testit)
+}
 ```
 
-## generate_digits.R
+## Generate digits (generate_digits.R)
 
-Function *__generate_digits__* that has two possible routes:
+Function *__generate_digits__* has two possible routes:
 
-* You can either build on demand model that will generate digits or
+* You can either train on demand model that will generate digits or
 * You can load already trained model and then generate digits.
 
 ```{r eval=FALSE}
@@ -57,6 +64,17 @@ generate_digits <- function(# simple generating digits with already computed mod
                             
                             # path for the model to load (if model_save_path is specified then it has to be equal)
                             model_file_name = "neural_network/models/model_3.RData") {
+```
+
+First it checks if numeric arguments have good format
+
+```{r eval = FALSE}
+  # checking format of numeric arguments
+  if (!is.numeric(c(digit_to_generate,num_of_digits_to_generate,
+                  image_quantity,hidden_layers,learning_rate,
+                  batchsize,num_of_epochs,image_resolution))) {
+    stop("Model hyperparameters are not all numeric")
+  }
 ```
 
 Routes are being chosen by setting parameters to desired values.  
@@ -95,7 +113,7 @@ It loads function *main_network* from *main.R* (that will be covered later), set
   
 ```
 
-Following snippet covers route in which one specifies number of digits to create (integer). No matter if one choosed to generate new model or choosed exisitng model it will load the one specified as *__model_file_name__*. By loading *gan.R* script all utility functions for neural network are being load and then use to generate new digits. 
+Following snippet covers route in which one specifies number of digits to create (integer). No matter if one choosed to generate new model or choosed exisitng model it will load the one specified as *__model_file_name__*. By loading *gan.R* script all utility functions for neural network are being load and then used to generate new digits. 
 
 
 ```{r eval=FALSE}
@@ -107,7 +125,7 @@ Following snippet covers route in which one specifies number of digits to create
   
   if (!is.numeric(digit_to_generate)) {
     
-    print("Specify desired digit as an integer")
+    stop("Specify digit_to_generate as an integer")
     
   } else if (digit_to_generate == 3) {
     
@@ -116,7 +134,11 @@ Following snippet covers route in which one specifies number of digits to create
       
       # generate new data - specify model and number of new data elements
       generation<<-generator(gan_model,num_of_digits_to_generate)
-    }
+  } else if (digit_to_generate != 3) {
+    # hardcoded for now (replace with desired digit)
+    stop("There is no model that can generate that digit_to_generate")
+    
+  }
 ```
 
 In the final step it either plots the data, saves it as csv, save it as pngs or it does it all :)
@@ -124,8 +146,8 @@ In the final step it either plots the data, saves it as csv, save it as pngs or 
 ```{r eval=FALSE}  
   if (!is.logical(plot_data) | !is.logical(save_data)) {
     
-    print("'show_data' and 'save_data' have to be logical") 
-  
+    stop("'show_data' and 'save_data' have to be logical")
+    
     }
 
   
@@ -147,7 +169,6 @@ In the final step it either plots the data, saves it as csv, save it as pngs or 
   
   save_digit_as_png <- function(q) {
     im <- as.cimg(rotate(matrix(unlist(generation[q,]),nrow = 28, byrow = TRUE)))
-    paste(q, ".png")
     save.image(im, paste("created_digits/",q, ".png"))
   }
   
@@ -159,7 +180,7 @@ In the final step it either plots the data, saves it as csv, save it as pngs or 
 
 ```
 
-For now it is hardcoded for generating digit *3* but it is really easy to implement new digits (but it takes a lot if time to prepare data and then train neural networks)
+For now it is hardcoded for generating digit *3* but it is really easy to implement new digits - just remove some conditions and add another else if (but it takes a lot if time to prepare data (aprox. 2h for 10000 images) and then train neural networks (aprox. 4-5h for quality model)
 
 ## GAN - neural networks (__main.R__)
 
@@ -288,7 +309,7 @@ main_network(dataset_file_path = "data/trojki_full.csv",
 
 ## Data prepare
 
-THe last function that is being used is *data_prepare*. 
+THe last function that is being used is *data_prepare*. It loads *__image_quantity__* of png images in *__folder_path__*. Then resize those images to *__resizing_to__* x *__resizing_to__* resolution and save them to *__destination_file__*. This function can be used on new dataset and separatly from function presented above, but only if inputed images are two dimensional (meaning that they have to be greyscaled).
 
 ```{r eval = FALSE}
 data_prepare <- function(folder_path="3/",
