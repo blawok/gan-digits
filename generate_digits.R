@@ -10,6 +10,7 @@ generate_digits <- function(# simple generating digits with already computed mod
                             digit_to_generate = NULL,
                             plot_data = FALSE,
                             save_data = FALSE,
+                            csv_path = "generated_digits.csv",
                             save_data_as_png = FALSE,
                             num_of_digits_to_generate = 9,
                             
@@ -52,19 +53,7 @@ generate_digits <- function(# simple generating digits with already computed mod
                  plot_digits = FALSE,
                  save_model = save_model,
                  model_file_name = model_save_path)
-    
-    g_nn<<-nn_model(input_dim=image_resolution*image_resolution,
-                    hidden=hidden_layers,
-                    output_dim=image_resolution*image_resolution,
-                    learningrate=learning_rate,
-                    activationfun="relu",
-                    output="sigm" )
-    d_nn<<-nn_model(input_dim=image_resolution*image_resolution,
-                    hidden=hidden_layers,
-                    output_dim=1,
-                    learningrate=learning_rate,
-                    activationfun="relu",
-                    output="sigm" )
+
     setwd("..")
   }
   
@@ -109,7 +98,7 @@ generate_digits <- function(# simple generating digits with already computed mod
   
   if (isTRUE(save_data) & is.numeric(digit_to_generate) & digit_to_generate == 3){
     # save data to a file
-    write.csv(generation, "generation_test.csv")
+    write.csv(generation, csv_path)
   }
   
   save_digit_as_png <- function(q) {
@@ -119,6 +108,7 @@ generate_digits <- function(# simple generating digits with already computed mod
   }
   
   if (isTRUE(save_data_as_png) & is.numeric(digit_to_generate) & digit_to_generate == 3){
+    # save data as pngs
     lapply(1:min(num_of_digits_to_generate, 9), save_digit_as_png)
   }
   

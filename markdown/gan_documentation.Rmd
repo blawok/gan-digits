@@ -1,0 +1,336 @@
+---
+title: "GAN_Advanced_R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+__Following markdown is just a documentation__ - code is splitted into chunks to enhance its clarity.  
+Code that can be runned is placed in another files.
+
+![](C:\Users\Asus\GIT\gan_digits\gan_graph.jpeg)
+
+Remember to open the project by clicking on the __gan_r.Rproj__ or set working directory to "./gan_digits".
+
+Load required packages:
+
+```{r message=FALSE}
+ if(!require(imager)){
+  install.packages('imager')
+  library(imager)
+} else {
+  library(imager)
+}
+```
+
+## generate_digits.R
+
+Function *__generate_digits__* that has two possible routes:
+
+* You can either build on demand model that will generate digits or
+* You can load already trained model and then generate digits.
+
+```{r eval=FALSE}
+generate_digits <- function(# simple generating digits with already computed model
+                            digit_to_generate = NULL,
+                            plot_data = FALSE,
+                            save_data = FALSE,
+                            csv_path = "generated_digits.csv",
+                            save_data_as_png = FALSE,
+                            num_of_digits_to_generate = 9,
+                            
+                            # route with network on demand
+                            network_on_demand = FALSE,
+                              prepare_data = FALSE,
+                                data_folder_path = "3/",
+                                dataset_file_path = "data/threes.csv",
+                                  image_quantity = 1000,
+                                  hidden_layers = 10,
+                                  learning_rate = 0.1,
+                                  batchsize = 300,
+                                  num_of_epochs = 20,
+                                  image_resolution = 28,
+                            save_model = FALSE,
+                            model_save_path = "models/test_model.RData",
+                            
+                            # path for the model to load (if model_save_path is specified then it has to be equal)
+                            model_file_name = "neural_network/models/model_3.RData") {
+```
+
+Routes are being chosen by setting parameters to desired values.  
+One can also choose if one wants to plot generated digits, save them as matrix in csv or as pngs.  
+
+The easiest route is to specify *__num_of_digits_to_generate__* and set *__plot_data__* to *__TRUE__* - it will load already trained model (default one), compute new digits and plot them.  
+
+If one wants to use the full capability of the function, e.g. train new model and prepare data for it, one has to set *__network_on_demand__* to *__TRUE__* and *__prepare_data__* to *__TRUE__* as well as all the paths to data and models (or use the default ones). One have possibility to choose most of the model hyperparameters. In this case the snippet below will be used.  
+
+It loads function *main_network* from *main.R* (that will be covered later), sets up the network, creates model based on one's hyperparameters and dataset and saves it to RData file.
+
+```{r eval=FALSE}
+  
+  if (isTRUE(network_on_demand)) {
+    # route with network on demand
+    
+    source("neural_network/main.R")
+    
+    main_network(dataset_file_path = dataset_file_path,
+                 prepare_data = prepare_data,
+                 data_folder_path = data_folder_path,
+                 image_quantity = image_quantity,
+                 hidden_layers = hidden_layers,
+                 learning_rate = learning_rate,
+                 batchsize = batchsize,
+                 num_of_epochs = num_of_epochs,
+                 image_resolution = image_resolution,
+                 matrix_columns_from = 2,
+                 matrix_columns_until = 785,
+                 plot_digits = FALSE,
+                 save_model = save_model,
+                 model_file_name = model_save_path)
+    
+    setwd("..")
+  }
+  
+```
+
+Following snippet covers route in which one specifies number of digits to create (integer). No matter if one choosed to generate new model or choosed exisitng model it will load the one specified as *__model_file_name__*. By loading *gan.R* script all utility functions for neural network are being load and then use to generate new digits. 
+
+
+```{r eval=FALSE}
+  if (is.numeric(digit_to_generate)) {
+    # load utility functions
+    source("neural_network/gan.R")
+  }
+  
+  
+  if (!is.numeric(digit_to_generate)) {
+    
+    print("Specify desired digit as an integer")
+    
+  } else if (digit_to_generate == 3) {
+    
+      # load desired model data
+      load(model_file_name)
+      
+      # generate new data - specify model and number of new data elements
+      generation<<-generator(gan_model,num_of_digits_to_generate)
+    }
+```
+
+In the final step it either plots the data, saves it as csv, save it as pngs or it does it all :)
+
+```{r eval=FALSE}  
+  if (!is.logical(plot_data) | !is.logical(save_data)) {
+    
+    print("'show_data' and 'save_data' have to be logical") 
+  
+    }
+
+  
+  plot_digit <- function(q) {
+    image(rotate(matrix(unlist(generation[q,]),nrow = 28, byrow = TRUE)), col=grey.colors(255))
+  }
+  
+  if (isTRUE(plot_data) & is.numeric(digit_to_generate) & digit_to_generate == 3) {
+    # draw new data (remember to enlarge plot window!!!)
+    par(mfrow=c(3,3))
+    lapply(1:min(num_of_digits_to_generate, 9), plot_digit)
+  }
+
+  
+  if (isTRUE(save_data) & is.numeric(digit_to_generate) & digit_to_generate == 3){
+    # save data to a file
+    write.csv(generation, csv_path)
+  }
+  
+  save_digit_as_png <- function(q) {
+    im <- as.cimg(rotate(matrix(unlist(generation[q,]),nrow = 28, byrow = TRUE)))
+    paste(q, ".png")
+    save.image(im, paste("created_digits/",q, ".png"))
+  }
+  
+  if (isTRUE(save_data_as_png) & is.numeric(digit_to_generate) & digit_to_generate == 3){
+    lapply(1:min(num_of_digits_to_generate, 9), save_digit_as_png)
+  }
+  
+}
+
+```
+
+For now it is hardcoded for generating digit *3* but it is really easy to implement new digits (but it takes a lot if time to prepare data and then train neural networks)
+
+## GAN - neural networks (__main.R__)
+
+Function that uses utilities from *gan.R* and *data_prepare.R* to create two neural network models and combine them to create generative adversarial network.
+
+Functions in *gan.R* are copied from https://github.com/LeeGyeongTak/generative-adversarial-networks-.
+We transformed them a little bit for our purpose and treated them as a library/package.
+
+There is an option to prepare dataset from your own images, using *data_prepare.R* (it will be covered later).
+
+```{r eval=FALSE}
+
+main_network <- function(dataset_file_path = "data/trojki_full.csv",
+                         prepare_data = FALSE,
+                         data_folder_path = "3/",
+                         image_quantity = 100,
+                         hidden_layers = 10,
+                         learning_rate = 0.1,
+                         batchsize = 300,
+                         num_of_epochs = 20,
+                         image_resolution = 28,
+                         matrix_columns_from = 2,
+                         matrix_columns_until = 785,
+                         plot_digits = FALSE,
+                         display_generation_image = FALSE,
+                         save_model = FALSE,
+                         model_file_name = "models/test_model.RData") {
+  
+  setwd("./neural_network")
+  
+  source("gan.R")
+  source("data_prepare.R")
+  
+  if (isTRUE(prepare_data)){
+    cat("Preparing data this may take aprox:", round(image_quantity*0.03), "sec")
+    data_prepare(folder_path = data_folder_path,
+                 destination_file = dataset_file_path,
+                 image_quantity = image_quantity,
+                 resizing_to = image_resolution)
+  }
+  
+  train<-read.csv(dataset_file_path)
+  
+  # load the data / normalize it / tranforms it into matrix
+  x <- read.csv(dataset_file_path) %>% 
+    .[,matrix_columns_from:matrix_columns_until] %>%
+    '/'(255) %>% 
+    as.matrix(.)
+  
+  ### initialize models as global variables
+  # generator
+  g_nn<<-nn_model(input_dim=image_resolution*image_resolution,
+                  hidden=hidden_layers,
+                  output_dim=image_resolution*image_resolution,
+                  learningrate=learning_rate,
+                  activationfun="relu",
+                  output="sigm" )
+  # discriminator
+  d_nn<<-nn_model(input_dim=image_resolution*image_resolution,
+                  hidden=hidden_layers,
+                  output_dim=1,
+                  learningrate=learning_rate,
+                  activationfun="relu",
+                  output="sigm" )
+  
+  numdata<-dim(train)[1]
+  num_f<-numdata* g_nn$input_dim
+  num_d<-numdata* d_nn$input_dim
+  
+  ### traning GAN using generator and discriminator
+  # if you wish you can specify display_generation_image = T to display plots of generated digits as the network is being trained
+  ganmodel<-gan(x,g_nn,d_nn,
+                batchsize = batchsize,
+                epoch = num_of_epochs,
+                disc_step=1,
+                display_generation_distribution = F,
+                display_generation_image = display_generation_image)
+  
+  ### After training model will be saved "gan_model".
+  gan_model$loss
+  
+  generation<-generator(gan_model,9)
+  
+  if (isTRUE(plot_digits)) {
+    # plotting generated digits (9 of them)
+      
+    rotate <- function(x) t(apply(x, 2, rev))
+    
+    par(mfrow=c(3,3))
+    lapply(1:9,
+           function(q) image(
+             rotate(matrix(unlist(generation[q,]),nrow = image_resolution, byrow = TRUE)),
+             col=grey.colors(255)
+           )
+  )
+  }
+  
+  if (isTRUE(save_model)) {
+    # saving model, generator and discriminator into RData file
+    save(gan_model, g_nn, d_nn, file=model_file_name)
+  }
+  
+  
+}
+
+```
+
+There is an option that you can run the model without *generate_digits.R*, simply upload the function *main_network* and run the code below. It works analogous to the *generate_digits.R*.
+
+```{r eval = FALSE}
+main_network(dataset_file_path = "data/trojki_full.csv",
+             prepare_data = FALSE,
+             data_folder_path = "3/",
+             image_quantity = 2000,
+             hidden_layers = 30,
+             learning_rate = 0.1,
+             batchsize = 300,
+             num_of_epochs = 30,
+             image_resolution = 28,
+             matrix_columns_from = 2,
+             matrix_columns_until = 785,
+             plot_digits = TRUE,
+             save_model = TRUE,
+             model_file_name = "models/test_model.RData")
+```
+
+## Data prepare
+
+THe last function that is being used is *data_prepare*. 
+
+```{r eval = FALSE}
+data_prepare <- function(folder_path="3/",
+                         destination_file = "threes_test.csv",
+                         image_quantity = 10,
+                         resizing_to = 28) {
+  
+  # loading all file names into one list
+  files <- list.files(path=folder_path, pattern="*.PNG", full.names=TRUE, recursive=FALSE)
+  
+  df <- data.frame()
+  image_number = 0
+  
+  # resizing images and transforming them into 1-dim vectors and appending them to one dataframe
+  for (file in files) {
+    if (image_number <= image_quantity) {
+      dfTemp <-  file %>%
+        load.image() %>%
+        resize(., size_x=resizing_to, size_y=resizing_to) %>%
+        as.matrix(.) %>%
+        as.vector(.) %>%
+        matrix(., nrow = 1) %>%
+        data.frame(.)
+
+      df <- rbind(df, dfTemp)
+    }
+    image_number = image_number + 1
+  }
+  
+  # encoding values to either 0 or 255 for better distinction
+  color_update <- function(x){
+    if (x == 1) {
+      x <- 0
+    } else if (x == 0) {
+      x <- 255
+    }
+  }
+  
+  df <- data.frame(apply(df, c(1,2), color_update))
+  
+  # saving file
+  write.csv(df, file = destination_file)
+}
+```
+

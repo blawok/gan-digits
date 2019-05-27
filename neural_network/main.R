@@ -11,10 +11,11 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
                          matrix_columns_from = 2,
                          matrix_columns_until = 785,
                          plot_digits = FALSE,
+                         display_generation_image = FALSE,
                          save_model = FALSE,
                          model_file_name = "models/test_model.RData") {
   
-  setwd("C:/Users/Asus/GIT/gan_digits/neural_network")
+  setwd("./neural_network")
   
   source("gan.R")
   source("data_prepare.R")
@@ -34,13 +35,15 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
     '/'(255) %>% 
     as.matrix(.)
   
-  ### initialize model
+  ### initialize models
+  # generator
   g_nn<<-nn_model(input_dim=image_resolution*image_resolution,
                   hidden=hidden_layers,
                   output_dim=image_resolution*image_resolution,
                   learningrate=learning_rate,
                   activationfun="relu",
                   output="sigm" )
+  # discriminator
   d_nn<<-nn_model(input_dim=image_resolution*image_resolution,
                   hidden=hidden_layers,
                   output_dim=1,
@@ -58,7 +61,7 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
                 epoch = num_of_epochs,
                 disc_step=1,
                 display_generation_distribution = F,
-                display_generation_image = F)
+                display_generation_image = display_generation_image)
   
   ### If you stop training, stopped model will be saved "gan_model".
   gan_model$loss
