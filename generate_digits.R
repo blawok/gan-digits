@@ -88,6 +88,7 @@ generate_digits <- function(# simple generating digits with already computed mod
       
       # generate new data - specify model and number of new data elements
       generation<<-generator(gan_model,num_of_digits_to_generate)
+      
   } else if (digit_to_generate != 3) {
     
     stop("There is no model that can generate that digit_to_generate")
@@ -138,17 +139,17 @@ generate_digits(digit_to_generate = 3,
                 num_of_digits_to_generate = 11,
                 
                 # route with network on demand
-                network_on_demand = FALSE,
+                network_on_demand = TRUE,
                 dataset_file_path = "data/trojki_6185.csv",
                 data_folder_path = "3/",
-                image_quantity = '1000dd',
+                image_quantity = 1000,
                 hidden_layers = 30,
                 learning_rate = 0.1,
-                batchsize = 300,
+                batchsize = 600,
                 num_of_epochs = 20,
                 image_resolution = 28,
                 prepare_data = FALSE,
                 save_model = TRUE,
                 model_save_path = "models/test_from_generate.RData",
                 
-                model_file_name = "neural_network/models/model_3.RData")
+                model_file_name = "neural_network/models/test_from_generate.RData")

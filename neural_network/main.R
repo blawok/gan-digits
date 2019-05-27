@@ -15,6 +15,7 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
                          save_model = FALSE,
                          model_file_name = "models/test_model.RData") {
   
+  # setwd("C:/Users/Asus/GIT/gan_digits/neural_network")
   setwd("./neural_network")
   
   source("gan.R")

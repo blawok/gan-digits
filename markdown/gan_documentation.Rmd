@@ -32,7 +32,7 @@ if(!require(testit)){
 }
 ```
 
-## Generate digits (generate_digits.R)
+## Generate digits (__generate_digits.R__)
 
 Function *__generate_digits__* has two possible routes:
 
@@ -307,7 +307,7 @@ main_network(dataset_file_path = "data/trojki_full.csv",
              model_file_name = "models/test_model.RData")
 ```
 
-## Data prepare
+## Data prepare (__data_prepare.R__)
 
 THe last function that is being used is *data_prepare*. It loads *__image_quantity__* of png images in *__folder_path__*. Then resize those images to *__resizing_to__* x *__resizing_to__* resolution and save them to *__destination_file__*. This function can be used on new dataset and separatly from function presented above, but only if inputed images are two dimensional (meaning that they have to be greyscaled).
 
