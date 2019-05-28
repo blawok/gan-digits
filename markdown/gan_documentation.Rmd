@@ -1,6 +1,8 @@
 ---
 title: "GAN_Advanced_R"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -12,11 +14,24 @@ Codes that can be runned are placed in different files.
 
 ![](C:\Users\Asus\GIT\gan_digits\gan_graph.jpeg)
 
+
+### Dataset containing ~ 50000 images:
+
+![](C:\Users\Asus\GIT\gan_digits\dataset.jpg)
+
+
+### Results:
+
+![](C:\Users\Asus\GIT\gan_digits\results_3.jpg)
+
+
 Remember to open the project by clicking on the __gan_r.Rproj__ or set working directory to "./gan_digits".
+
+## Generate digits (__generate_digits.R__)
 
 Load required packages:
 
-```{r message=FALSE}
+```{r eval=FALSE}
  if(!require(imager)){
   install.packages('imager')
   library(imager)
@@ -32,7 +47,6 @@ if(!require(testit)){
 }
 ```
 
-## Generate digits (__generate_digits.R__)
 
 Function *__generate_digits__* has two possible routes:
 
@@ -59,6 +73,7 @@ generate_digits <- function(# simple generating digits with already computed mod
                                   batchsize = 300,
                                   num_of_epochs = 20,
                                   image_resolution = 28,
+                            display_generation_image = TRUE,
                             save_model = FALSE,
                             model_save_path = "models/test_model.RData",
                             
@@ -105,6 +120,7 @@ It loads function *main_network* from *main.R* (that will be covered later), set
                  matrix_columns_from = 2,
                  matrix_columns_until = 785,
                  plot_digits = FALSE,
+                 display_generation_image = display_generation_image,
                  save_model = save_model,
                  model_file_name = model_save_path)
     
@@ -129,11 +145,16 @@ Following snippet covers route in which one specifies number of digits to create
     
   } else if (digit_to_generate == 3) {
     
-      # load desired model data
+      # load desired model data (plus generator and discriminator)
       load(model_file_name)
+      
+      # creating global variables to store both models
+      g_nn <<- g_nn
+      d_nn <<- d_nn
       
       # generate new data - specify model and number of new data elements
       generation<<-generator(gan_model,num_of_digits_to_generate)
+      
   } else if (digit_to_generate != 3) {
     # hardcoded for now (replace with desired digit)
     stop("There is no model that can generate that digit_to_generate")

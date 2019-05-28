@@ -32,6 +32,7 @@ generate_digits <- function(# simple generating digits with already computed mod
                                   batchsize = 300,
                                   num_of_epochs = 20,
                                   image_resolution = 28,
+                            display_generation_image = FALSE,
                             save_model = FALSE,
                             model_save_path = "models/test_model.RData",
                             
@@ -45,7 +46,7 @@ generate_digits <- function(# simple generating digits with already computed mod
   }
   
   # setwd("..")
-  setwd("C:/Users/Asus/GIT/gan_digits")
+  # setwd("C:/Users/Asus/GIT/gan_digits")
   
   if (isTRUE(network_on_demand)) {
     # route with network on demand
@@ -64,6 +65,7 @@ generate_digits <- function(# simple generating digits with already computed mod
                  matrix_columns_from = 2,
                  matrix_columns_until = 785,
                  plot_digits = FALSE,
+                 display_generation_image = display_generation_image,
                  save_model = save_model,
                  model_file_name = model_save_path)
 
@@ -86,6 +88,10 @@ generate_digits <- function(# simple generating digits with already computed mod
       # load desired model data
       load(model_file_name)
       
+      # creating global variables to store both models
+      g_nn <<- g_nn
+      d_nn <<- d_nn
+    
       # generate new data - specify model and number of new data elements
       generation<<-generator(gan_model,num_of_digits_to_generate)
       
@@ -139,7 +145,7 @@ generate_digits(digit_to_generate = 3,
                 num_of_digits_to_generate = 11,
                 
                 # route with network on demand
-                network_on_demand = TRUE,
+                network_on_demand = FALSE,
                 dataset_file_path = "data/trojki_6185.csv",
                 data_folder_path = "3/",
                 image_quantity = 1000,
@@ -149,7 +155,8 @@ generate_digits(digit_to_generate = 3,
                 num_of_epochs = 20,
                 image_resolution = 28,
                 prepare_data = FALSE,
-                save_model = TRUE,
-                model_save_path = "models/test_from_generate.RData",
+                display_generation_image = TRUE,
+                save_model = FALSE,
+                model_save_path = "models/model_3_600_30.RData",
                 
-                model_file_name = "neural_network/models/test_from_generate.RData")
+                model_file_name = "neural_network/models/model_3_1000_50.RData")

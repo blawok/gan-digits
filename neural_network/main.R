@@ -91,18 +91,19 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
 
 
 # # example of usage
-# main_network(dataset_file_path = "data/trojki_full.csv",
-#              prepare_data = TRUE,
-#              data_folder_path = "3/",
-#              image_quantity = 2000,
-#              hidden_layers = 30,
-#              learning_rate = 0.1,
-#              batchsize = 300,
-#              num_of_epochs = 30,
-#              image_resolution = 28,
-#              matrix_columns_from = 2,
-#              matrix_columns_until = 785,
-#              plot_digits = TRUE,
-#              save_model = TRUE,
-#              model_file_name = "models/test_model.RData")
+main_network(dataset_file_path = "data/trojki_full_255.csv",
+             prepare_data = FALSE,
+             data_folder_path = "3/",
+             display_generation_image = TRUE,
+             image_quantity = 2000,
+             hidden_layers = 30,
+             learning_rate = 0.1,
+             batchsize = 400,
+             num_of_epochs = 30,
+             image_resolution = 28,
+             matrix_columns_from = 2,
+             matrix_columns_until = 785,
+             plot_digits = TRUE,
+             save_model = TRUE,
+             model_file_name = "models/model_3_16388_10.RData")
 
