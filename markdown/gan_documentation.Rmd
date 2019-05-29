@@ -1,8 +1,8 @@
 ---
 title: "GAN_Advanced_R"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -12,17 +12,28 @@ knitr::opts_chunk$set(echo = TRUE)
 __Following markdown is just a documentation__ - code is splitted into chunks to enhance its clarity.  
 Codes that can be runned are placed in different files.
 
-![](C:\Users\Asus\GIT\gan_digits\gan_graph.jpeg)
+![](.\gan_graph.jpeg)  
+
+
+
+### Function flowchart
+<center>
+![](.\flowchart_gan.JPG)
+</center>
+
 
 
 ### Dataset containing ~ 50000 images:
+Source: https://github.com/kensanata/numbers
 
-![](C:\Users\Asus\GIT\gan_digits\dataset.jpg)
+![](.\dataset.jpg)  
+
+
 
 
 ### Results:
 
-![](C:\Users\Asus\GIT\gan_digits\results_3.jpg)
+![](.\results_3.jpg)  
 
 
 Remember to open the project by clicking on the __gan_r.Rproj__ or set working directory to "./gan_digits".
@@ -203,6 +214,41 @@ In the final step it either plots the data, saves it as csv, save it as pngs or 
 
 For now it is hardcoded for generating digit *3* but it is really easy to implement new digits - just remove some conditions and add another else if (but it takes a lot if time to prepare data (aprox. 2h for 10000 images) and then train neural networks (aprox. 4-5h for quality model)
 
+### Calling function generate_digits
+
+```{r eval=FALSE}
+# the easiest path
+generate_digits(digit_to_generate = 3,
+                plot_data = TRUE,
+                save_data = FALSE,
+                save_data_as_png = TRUE,
+                num_of_digits_to_generate = 11,
+                model_file_name = "neural_network/models/model_3_1000_50.RData")
+
+
+# full potential
+generate_digits(digit_to_generate = 3,
+                plot_data = TRUE,
+                save_data = FALSE,
+                save_data_as_png = TRUE,
+                num_of_digits_to_generate = 9,
+                # route with network on demand
+                network_on_demand = TRUE,
+                dataset_file_path = "data/test_test.csv",
+                data_folder_path = "3/",
+                image_quantity = 2001,
+                hidden_layers = 20,
+                learning_rate = 0.1,
+                batchsize = 600,
+                num_of_epochs = 6,
+                image_resolution = 28,
+                prepare_data = TRUE,
+                display_generation_image = TRUE,
+                save_model = TRUE,
+                model_save_path = "models/model_3_test.RData",
+                model_file_name = "neural_network/models/model_3_test.RData")
+```
+
 ## GAN - neural networks (__main.R__)
 
 Function that uses utilities from *gan.R* and *data_prepare.R* to create two neural network models and combine them to create generative adversarial network.
@@ -340,6 +386,8 @@ data_prepare <- function(folder_path="3/",
   
   # loading all file names into one list
   files <- list.files(path=folder_path, pattern="*.PNG", full.names=TRUE, recursive=FALSE)
+  
+  image_quantity <- min(length(files), image_quantity)
   
   df <- data.frame()
   image_number = 0

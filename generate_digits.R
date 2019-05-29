@@ -25,7 +25,7 @@ generate_digits <- function(# simple generating digits with already computed mod
                             network_on_demand = FALSE,
                               prepare_data = FALSE,
                                 data_folder_path = "3/",
-                                dataset_file_path = "data/trojki_test_test_test.csv",
+                                dataset_file_path = "data/trojki_full_255.csv",
                                   image_quantity = 1000,
                                   hidden_layers = 10,
                                   learning_rate = 0.1,
@@ -34,10 +34,14 @@ generate_digits <- function(# simple generating digits with already computed mod
                                   image_resolution = 28,
                             display_generation_image = FALSE,
                             save_model = FALSE,
-                            model_save_path = "models/test_model.RData",
+                            model_save_path = "models/model_3_1000_50.RData",
                             
-                            # path for either saving the model or loading it
-                            model_file_name = "neural_network/models/test_model.RData") {
+                            # path for the model to load (if model_save_path is specified then it has to be equal)
+                            model_file_name = "neural_network/models/model_3_1000_50.RData") {
+  
+  
+  starting_directory <- ifelse(grepl("neural_network", getwd()), setwd(".."), getwd())
+  
   
   if (!is.numeric(c(digit_to_generate,num_of_digits_to_generate,
                   image_quantity,hidden_layers,learning_rate,
@@ -45,8 +49,13 @@ generate_digits <- function(# simple generating digits with already computed mod
     stop("Model hyperparameters are not all numeric")
   }
   
-  # setwd("..")
-  # setwd("C:/Users/Asus/GIT/gan_digits")
+  if (batchsize/image_quantity > 0.5 | learning_rate > 0.5) {
+    message("Consider specifing different hyperparameters for better model estimation. (batch size or learning rate")
+  }
+  
+  if (image_quantity < 300) {
+    warning("Consider increasing number of images to train on.")
+  }
   
   if (isTRUE(network_on_demand)) {
     # route with network on demand
@@ -146,17 +155,51 @@ generate_digits(digit_to_generate = 3,
                 
                 # route with network on demand
                 network_on_demand = FALSE,
-                dataset_file_path = "data/trojki_6185.csv",
+                dataset_file_path = "data/testy_testy.csv",
                 data_folder_path = "3/",
-                image_quantity = 1000,
-                hidden_layers = 30,
+                image_quantity = 2001,
+                hidden_layers = 20,
                 learning_rate = 0.1,
                 batchsize = 600,
-                num_of_epochs = 20,
+                num_of_epochs = 6,
                 image_resolution = 28,
                 prepare_data = FALSE,
                 display_generation_image = TRUE,
                 save_model = FALSE,
-                model_save_path = "models/model_3_600_30.RData",
-                
-                model_file_name = "neural_network/models/model_3_1000_50.RData")
+                model_save_path = "models/model_3_test.RData",
+                model_file_name = "neural_network/models/model_3_test.RData")
+
+                # model_save_path = "models/model_3_1000_50.RData",
+                # model_file_name = "neural_network/models/model_3_1000_50.RData")
+
+# # the easiest path
+# generate_digits(digit_to_generate = 3,
+#                 plot_data = TRUE,
+#                 save_data = FALSE,
+#                 save_data_as_png = TRUE,
+#                 num_of_digits_to_generate = 11,
+#                 model_file_name = "neural_network/models/model_3_test.RData")
+# 
+# 
+# # full potential
+# generate_digits(digit_to_generate = 3,
+#                 plot_data = TRUE,
+#                 save_data = FALSE,
+#                 save_data_as_png = TRUE,
+#                 num_of_digits_to_generate = 9,
+#                 # route with network on demand
+#                 network_on_demand = TRUE,
+#                 dataset_file_path = "data/test_test.csv",
+#                 data_folder_path = "3/",
+#                 image_quantity = 2001,
+#                 hidden_layers = 20,
+#                 learning_rate = 0.1,
+#                 batchsize = 600,
+#                 num_of_epochs = 6,
+#                 image_resolution = 28,
+#                 prepare_data = TRUE,
+#                 display_generation_image = TRUE,
+#                 save_model = TRUE,
+#                 model_save_path = "models/model_3_test.RData",
+#                 model_file_name = "neural_network/models/model_3_test.RData")
+

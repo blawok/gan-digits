@@ -1,5 +1,5 @@
 
-main_network <- function(dataset_file_path = "data/trojki_full.csv",
+main_network <- function(dataset_file_path = "data/trojki_full_255.csv",
                          prepare_data = FALSE,
                          data_folder_path = "3/",
                          image_quantity = 100,
@@ -13,16 +13,15 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
                          plot_digits = FALSE,
                          display_generation_image = FALSE,
                          save_model = FALSE,
-                         model_file_name = "models/test_model.RData") {
+                         model_file_name = "models/model_3_1000_50.RData") {
   
-  # setwd("C:/Users/Asus/GIT/gan_digits/neural_network")
   setwd("./neural_network")
   
   source("gan.R")
   source("data_prepare.R")
   
   if (isTRUE(prepare_data)){
-    cat("Preparing data this may take aprox:", round(image_quantity*0.03), "sec")
+    cat("Preparing data this may take approx.:", round(image_quantity*0.03), "sec")
     data_prepare(folder_path = data_folder_path,
                  destination_file = dataset_file_path,
                  image_quantity = image_quantity,
@@ -91,19 +90,19 @@ main_network <- function(dataset_file_path = "data/trojki_full.csv",
 
 
 # # example of usage
-main_network(dataset_file_path = "data/trojki_full_255.csv",
-             prepare_data = FALSE,
-             data_folder_path = "3/",
-             display_generation_image = TRUE,
-             image_quantity = 2000,
-             hidden_layers = 30,
-             learning_rate = 0.1,
-             batchsize = 400,
-             num_of_epochs = 30,
-             image_resolution = 28,
-             matrix_columns_from = 2,
-             matrix_columns_until = 785,
-             plot_digits = TRUE,
-             save_model = TRUE,
-             model_file_name = "models/model_3_16388_10.RData")
+# main_network(dataset_file_path = "data/trojki_full_255.csv",
+#              prepare_data = FALSE,
+#              data_folder_path = "3/",
+#              display_generation_image = TRUE,
+#              image_quantity = 2000,
+#              hidden_layers = 30,
+#              learning_rate = 0.1,
+#              batchsize = 400,
+#              num_of_epochs = 30,
+#              image_resolution = 28,
+#              matrix_columns_from = 2,
+#              matrix_columns_until = 785,
+#              plot_digits = TRUE,
+#              save_model = TRUE,
+#              model_file_name = "models/model_3_1000_50.RData")
 

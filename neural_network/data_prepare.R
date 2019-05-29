@@ -16,6 +16,8 @@ data_prepare <- function(folder_path="3/",
   # loading all file names into one list
   files <- list.files(path=folder_path, pattern="*.PNG", full.names=TRUE, recursive=FALSE)
   
+  image_quantity <- min(length(files), image_quantity)
+  
   df <- data.frame()
   image_number = 0
   
